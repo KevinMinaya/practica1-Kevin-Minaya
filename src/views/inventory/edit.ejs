@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar producto | Ferretería El Martillo</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/productos">
+        <span class="brand-mark">M</span>
+        <span>EL MARTILLO<small>FERRETERÍA</small></span>
+      </a>
+      <div class="topbar-actions">
+        <span class="user-email"><%= userEmail %></span>
+        <form action="/logout" method="post">
+          <button class="button button-outline" type="submit">Cerrar sesión</button>
+        </form>
+      </div>
+    </header>
+    <main class="form-page">
+      <a class="back-link" href="/productos">← Volver al inventario</a>
+      <section class="panel edit-panel">
+        <p class="eyebrow">ACTUALIZAR CATÁLOGO</p>
+        <h1>Editar producto</h1>
+        <p class="muted">Modifica los datos y guarda los cambios.</p>
+        <% if (error) { %>
+          <p class="alert alert-error" role="alert"><%= error %></p>
+        <% } %>
+        <form action="/productos/<%= product.id %>/editar" method="post" class="stack-form">
+          <label for="codigo">Código</label>
+          <input id="codigo" name="codigo" type="text" maxlength="50" value="<%= product.codigo %>" required />
+          <label for="nombre">Nombre</label>
+          <input id="nombre" name="nombre" value="<%= product.nombre %>" required maxlength="120" />
+          <label for="categoriaId">Categoría</label>
+          <select id="categoriaId" name="categoriaId" required>
+            <option value="">Selecciona una categoría</option>
+            <% categories.forEach((category) => { %>
+              <option value="<%= category.id %>" <%= String(product.categoriaId || '') === String(category.id) ? 'selected' : '' %>><%= category.nombre %></option>
+            <% }) %>
+          </select>
+          <label for="unidadMedida">Unidad de medida</label>
+          <input id="unidadMedida" name="unidadMedida" value="<%= product.unidadMedida || '' %>" required maxlength="40" />
+          <div class="form-row">
+            <div>
+              <label for="precioVenta">Precio de venta</label>
+              <input id="precioVenta" name="precioVenta" type="number" min="0" step="0.01" value="<%= product.precioVenta %>" required />
+            </div>
+            <div>
+              <label for="precioCompra">Precio de compra</label>
+              <input id="precioCompra" name="precioCompra" type="number" min="0" step="0.01" value="<%= product.precioCompra %>" required />
+            </div>
+            <div>
+              <label for="stock">Existencias</label>
+              <input id="stock" name="stock" type="number" min="0" step="1" value="<%= product.stock %>" required />
+            </div>
+          </div>
+          <div class="form-actions">
+            <a class="button button-outline" href="/productos">Cancelar</a>
+            <button class="button button-primary" type="submit">Guardar cambios</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

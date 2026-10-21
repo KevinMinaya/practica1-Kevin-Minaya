@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventario | Ferretería El Martillo</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/productos">
+        <span class="brand-mark">M</span>
+        <span>EL MARTILLO<small>FERRETERÍA</small></span>
+      </a>
+      <div class="topbar-actions">
+        <span class="user-email"><%= userEmail %></span>
+        <form action="/logout" method="post">
+          <button class="button button-outline" type="submit">Cerrar sesión</button>
+        </form>
+      </div>
+    </header>
+
+    <main class="page-wrap">
+      <section class="page-heading">
+        <div>
+          <p class="eyebrow">PANEL DE ADMINISTRACIÓN</p>
+          <h1>Inventario de productos</h1>
+          <p class="muted">Controla existencias, precios y productos de tu ferretería.</p>
+        </div>
+      </section>
+
+      <% if (message) { %>
+        <p class="alert alert-success" role="status"><%= message %></p>
+      <% } %>
+      <% if (error) { %>
+        <p class="alert alert-error" role="alert"><%= error %></p>
+      <% } %>
+
+      <section class="metrics-grid" aria-label="Resumen del inventario">
+        <article class="metric-card">
+          <span class="metric-label">Productos registrados</span>
+          <strong><%= metrics.productCount %></strong>
+        </article>
+        <article class="metric-card">
+          <span class="metric-label">Por reponer</span>
+          <strong class="<%= metrics.lowStockCount ? 'text-warning' : '' %>"><%= metrics.lowStockCount %></strong>
+        </article>
+        <article class="metric-card">
+          <span class="metric-label">Valor al precio de compra</span>
+          <strong>$<%= metrics.inventoryValue.toFixed(2) %></strong>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">NUEVO REGISTRO</p>
+              <h2>Agregar producto</h2>
+            </div>
+          </div>
+          <form action="/productos" method="post" class="stack-form">
+            <label for="codigo">Código</label>
+            <input id="codigo" name="codigo" type="text" maxlength="50" value="<%= formData.codigo || '' %>" required />
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" value="<%= formData.nombre || '' %>" required maxlength="120" />
+            <label for="categoriaId">Categoría</label>
+            <select id="categoriaId" name="categoriaId" required>
+              <option value="">Selecciona una categoría</option>
+              <% categories.forEach((category) => { %>
+                <option value="<%= category.id %>" <%= String(formData.categoriaId || '') === String(category.id) ? 'selected' : '' %>><%= category.nombre %></option>
+              <% }) %>
+            </select>
+            <label for="unidadMedida">Unidad de medida</label>
+            <input id="unidadMedida" name="unidadMedida" value="<%= formData.unidadMedida || '' %>" placeholder="Pieza, metro, litro..." required maxlength="40" />
+            <div class="form-row">
+              <div>
+                <label for="precioVenta">Precio de venta</label>
+                <input id="precioVenta" name="precioVenta" type="number" min="0" step="0.01" value="<%= formData.precioVenta ?? '' %>" required />
+              </div>
+              <div>
+                <label for="precioCompra">Precio de compra</label>
+                <input id="precioCompra" name="precioCompra" type="number" min="0" step="0.01" value="<%= formData.precioCompra ?? '' %>" required />
+              </div>
+            </div>
+            <div>
+              <label for="stock">Existencias</label>
+              <input id="stock" name="stock" type="number" min="0" step="1" value="<%= formData.stock ?? '' %>" required />
+            </div>
+            <button class="button button-primary button-full" type="submit">Guardar producto</button>
+          </form>
+        </article>
+
+        <article class="panel inventory-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">CATÁLOGO</p>
+              <h2>Productos</h2>
+            </div>
+            <span class="count-pill"><%= products.length %></span>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Categoría</th>
+                  <th>Precio</th>
+                  <th>Unidad</th>
+                  <th>Stock</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (products.length) { %>
+                  <% products.forEach((product) => { %>
+                    <tr>
+                      <td>
+                        <strong><%= product.nombre %></strong>
+                        <span class="table-subtext">Código: <%= product.codigo %></span>
+                      </td>
+                      <td><%= product.categoria %></td>
+                      <td>$<%= Number(product.precioVenta).toFixed(2) %></td>
+                      <td><%= product.unidadMedida %></td>
+                      <td>
+                        <span class="stock-badge <%= product.stock <= 5 ? 'stock-low' : '' %>">
+                          <%= product.stock %>
+                        </span>
+                      </td>
+                      <td>
+                        <div class="row-actions">
+                          <a class="button button-small button-outline" href="/productos/<%= product.id %>/editar">Editar</a>
+                          <form action="/productos/<%= product.id %>/eliminar" method="post" onsubmit="return confirm('¿Eliminar este producto?');">
+                            <button class="button button-small button-danger" type="submit">Eliminar</button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr><td class="empty-state" colspan="6">Aún no hay productos. Agrega el primero con el formulario.</td></tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+      <footer class="footer">Ferretería El Martillo <span>·</span> Inventario conectado a Supabase</footer>
+    </main>
+  </body>
+</html>

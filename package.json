@@ -1,0 +1,28 @@
+{
+  "name": "crud_node",
+  "version": "1.0.0",
+  "description": "Inventario de ferretería con Node.js, Express, EJS y MySQL",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"No hay tests configurados\"",
+    "crear-usuario": "node scripts/crear-usuario.js"
+  },
+  "keywords": [
+    "crud",
+    "node",
+    "express",
+    "ejs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^18.0.8",
+    "ejs": "^3.1.10",
+    "express": "^5.3.0",
+    "express-session": "^1.19.0",
+    "mysql2": "^3.24.6"
+  }
+}
